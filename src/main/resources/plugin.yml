@@ -1,0 +1,5 @@
+main: github.AlpsBTE_Chat.AlpsBTE_Chat
+version: 1.0
+api-version: 1.12.2
+name: AlpsBTE-Chat
+author: R3tuxn
