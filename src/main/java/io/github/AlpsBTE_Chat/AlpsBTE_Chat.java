@@ -9,6 +9,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -22,22 +24,43 @@ public class AlpsBTE_Chat extends JavaPlugin implements Listener, PluginMessageL
     private FileConfiguration config;
     private File configFile;
 
+    private static AlpsBTE_Chat plugin;
+
     @Override
     public void onEnable() {
+        plugin = this;
 
         reloadConfig();
 
         getServer().getPluginManager().registerEvents(this, this);
         getServer().getMessenger().registerIncomingPluginChannel(this, "AlpsBTE-Chat", this);
 
+        getCommand("chatReload").setExecutor(new CMD_Reload());
+
         getLogger().log(Level.INFO, "Successfully enabled AlpsBTE-Chat plugin!");
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    public static AlpsBTE_Chat getPlugin() {
+        return plugin;
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChatEvent(AsyncPlayerChatEvent event) {
-        event.setCancelled(true);
-        Bukkit.broadcastMessage(getFormattedMessage(event.getPlayer(), event.getMessage()));
+        event.setFormat(getFormattedMessage(event.getPlayer(), event.getMessage()));
+
         broadcastPlayerMessage(event.getPlayer(), event.getMessage());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerJoinEvent(PlayerJoinEvent event) {
+        event.setJoinMessage(null);
+        Bukkit.broadcastMessage("§7[§6+§7] > " + event.getPlayer().getName());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerLeaveEvent(PlayerQuitEvent event) {
+        event.setQuitMessage(null);
+        Bukkit.broadcastMessage("§7[§c-§7] > " + event.getPlayer().getName());
     }
 
     @Override
@@ -57,20 +80,22 @@ public class AlpsBTE_Chat extends JavaPlugin implements Listener, PluginMessageL
     }
 
     public void broadcastPlayerMessage(Player player, String message) {
-        try {
-            Socket socket = new Socket(config.getString("server.IP"), config.getInt("server.port"));
-            OutputStream output = socket.getOutputStream();
-            ObjectOutputStream objectOutput = new ObjectOutputStream(output);
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            try {
+                Socket socket = new Socket(config.getString("server.IP"), config.getInt("server.port"));
+                OutputStream output = socket.getOutputStream();
+                ObjectOutputStream objectOutput = new ObjectOutputStream(output);
 
-            // Send player message
-            objectOutput.writeObject(getFormattedMessage(player, message));
-            objectOutput.writeObject(getConfig().getString("name"));
-            objectOutput.flush();
+                // Send player message
+                objectOutput.writeObject(getFormattedMessage(player, message));
+                objectOutput.writeObject(getConfig().getString("name"));
+                objectOutput.flush();
 
-            objectOutput.close();
-        } catch (IOException ex) {
-            getLogger().log(Level.SEVERE, "Could not broadcast player message to Bungeecord!", ex);
-        }
+                objectOutput.close();
+            } catch (IOException ex) {
+                getLogger().log(Level.SEVERE, "Could not broadcast player message to Bungeecord!", ex);
+            }
+        });
     }
 
     public String getFormattedMessage(Player player, String message) {
