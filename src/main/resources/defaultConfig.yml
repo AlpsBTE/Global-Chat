@@ -1,4 +1,4 @@
-name: null
-server:
-  IP: localhost
-  port: 42069
+server-name: null
+socket:
+  IP: null
+  port: null
