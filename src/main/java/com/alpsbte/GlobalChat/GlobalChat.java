@@ -72,9 +72,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
 
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
         try {
-            if(in.available() >= 1) {
-                Bukkit.broadcastMessage(in.readUTF());
-            }
+            Bukkit.broadcastMessage(in.readUTF());
         } catch (IOException ex) {
             getLogger().log(Level.SEVERE, "Could not broadcast received socket message!", ex);
         }
