@@ -1,4 +1,4 @@
-package com.alpsbte.GlobalChat;
+package com.alpsbte.globalchat;
 
 import me.clip.placeholderapi.*;
 import org.bukkit.Bukkit;
