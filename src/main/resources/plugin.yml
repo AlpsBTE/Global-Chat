@@ -3,3 +3,8 @@ version: 1.2
 api-version: 1.12.2
 name: AlpsBTE-GlobalChat
 author: R3tuxn
+
+commands:
+  gcreload:
+    description: Reloads Global-Chat config
+    usage: /gcreload

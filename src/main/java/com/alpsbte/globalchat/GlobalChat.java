@@ -21,6 +21,8 @@ import java.util.logging.Level;
 
 public class GlobalChat extends JavaPlugin implements Listener, PluginMessageListener {
 
+    private static GlobalChat plugin;
+
     private FileConfiguration config;
     private File configFile;
 
@@ -30,12 +32,13 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
 
     @Override
     public void onEnable() {
+        plugin = this;
+
+        this.getCommand("gcreload").setExecutor(new CMD_Reload());
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "alpsbte:globalchat", this);
 
-        this.serverName = getConfig().getString("server-name");
-        this.socketIP = getConfig().getString("socket.IP");
-        this.socketPort = getConfig().getInt("socket.port");
+        reloadConfig();
 
         this.getLogger().log(Level.INFO, "Successfully enabled AlpsBTE-GlobalChat plugin!");
     }
@@ -113,6 +116,10 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
         }
 
         saveConfig();
+
+        this.serverName = getConfig().getString("server-name");
+        this.socketIP = getConfig().getString("socket.IP");
+        this.socketPort = getConfig().getInt("socket.port");
     }
 
     @Override
@@ -134,5 +141,9 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
         } catch (IOException ex) {
             getLogger().log(Level.SEVERE, "Could not save config to " + configFile, ex);
         }
+    }
+
+    public static GlobalChat getPlugin() {
+        return plugin;
     }
 }
