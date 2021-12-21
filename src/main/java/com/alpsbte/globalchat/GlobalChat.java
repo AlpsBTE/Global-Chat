@@ -100,7 +100,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     }
 
     public String getFormattedMessage(Player player, String message) {
-        return PlaceholderAPI.setPlaceholders(player, "§7[§a" + player.getWorld().getName().substring(0,1).toUpperCase() + "§7] [%luckperms_prefix%§7] %player_name% &7&l> &7" + message);
+        return PlaceholderAPI.setPlaceholders(player, "§7[§a" + player.getWorld().getName().substring(0,1).toUpperCase() + "§7] [%luckperms_prefix%§7] %player_name% &7&l> &7") + message;
     }
 
     @Override
