@@ -1,6 +1,7 @@
 package com.alpsbte.globalchat;
 
 import me.clip.placeholderapi.*;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -14,10 +15,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class GlobalChat extends JavaPlugin implements Listener, PluginMessageListener {
@@ -35,7 +38,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     public void onEnable() {
         plugin = this;
 
-        this.getCommand("gcreload").setExecutor(new CMD_Reload());
+        Objects.requireNonNull(this.getCommand("gcreload")).setExecutor(new CMD_Reload());
         this.getServer().getPluginManager().registerEvents(this, this);
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "alpsbte:globalchat", this);
 
@@ -69,7 +72,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     }
 
     @Override
-    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
+    public void onPluginMessageReceived(String channel, @NotNull Player player, byte[] message) {
         if (!channel.equals("alpsbte:globalchat")) {
             return;
         }
@@ -101,7 +104,8 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     }
 
     public String getFormattedMessage(Player player, String message) {
-        return ChatColor.translateAlternateColorCodes('&', PlaceholderAPI.setPlaceholders(player, "§7[§a" + player.getWorld().getName().substring(0,1).toUpperCase() + "§7] [%luckperms_prefix%§7] %player_name% &7&l> &7") + message);
+        return ChatColor.translateAlternateColorCodes('&',
+                PlaceholderAPI.setPlaceholders(player, "§7[§a" + player.getWorld().getName().substring(0,1).toUpperCase() + "§7] [%luckperms_prefix%§7] %player_name% &7&l> &7") + message);
     }
 
     @Override
@@ -111,7 +115,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
             config = YamlConfiguration.loadConfiguration(configFile);
         } else {
             // Look for default configuration file
-            Reader defConfigStream = new InputStreamReader(this.getResource("defaultConfig.yml"), StandardCharsets.UTF_8);
+            Reader defConfigStream = new InputStreamReader(Objects.requireNonNull(this.getResource("defaultConfig.yml")), StandardCharsets.UTF_8);
 
             config = YamlConfiguration.loadConfiguration(defConfigStream);
         }
@@ -124,7 +128,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     }
 
     @Override
-    public FileConfiguration getConfig() {
+    public @NotNull FileConfiguration getConfig() {
         if (config == null) {
             reloadConfig();
         }
