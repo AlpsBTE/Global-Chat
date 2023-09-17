@@ -1,4 +1,5 @@
 server-name: null
+enable-global-chat: true
 socket:
   IP: null
   port: null

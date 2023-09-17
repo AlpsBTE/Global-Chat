@@ -1,9 +1,8 @@
 package com.alpsbte.globalchat;
 
 import me.clip.placeholderapi.*;
-import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -31,6 +30,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     private File configFile;
 
     private String serverName;
+    private boolean enableGlobalChat;
     private String socketIP;
     private int socketPort;
 
@@ -56,19 +56,19 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerChatEvent(AsyncPlayerChatEvent event) {
         event.setFormat(getFormattedMessage(event.getPlayer(), event.getMessage()));
-        broadcastPlayerMessage(event.getPlayer(), event.getMessage());
+        if (enableGlobalChat) broadcastPlayerMessage(event.getPlayer(), event.getMessage());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerJoinEvent(PlayerJoinEvent event) {
         event.setJoinMessage(null);
-        Bukkit.broadcastMessage("§7[§6+§7] > " + event.getPlayer().getName());
+        Bukkit.broadcastMessage("§7[§6+§7] » " + event.getPlayer().getName());
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerLeaveEvent(PlayerQuitEvent event) {
         event.setQuitMessage(null);
-        Bukkit.broadcastMessage("§7[§c-§7] > " + event.getPlayer().getName());
+        Bukkit.broadcastMessage("§7[§c-§7] » " + event.getPlayer().getName());
     }
 
     @Override
@@ -104,8 +104,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
     }
 
     public String getFormattedMessage(Player player, String message) {
-        return ChatColor.translateAlternateColorCodes('&',
-                PlaceholderAPI.setPlaceholders(player, "§7[§a" + player.getWorld().getName().substring(0,1).toUpperCase() + "§7] [%luckperms_prefix%§7] %player_name% &7&l> &7") + message);
+        return ChatColor.translateAlternateColorCodes('&', PlaceholderAPI.setPlaceholders(player, "§8[§a" + player.getWorld().getName().substring(0,1).toUpperCase() + "§8] [%luckperms_prefix%§8]&7 %player_name% &8» &7") + message);
     }
 
     @Override
@@ -123,6 +122,7 @@ public class GlobalChat extends JavaPlugin implements Listener, PluginMessageLis
         saveConfig();
 
         this.serverName = getConfig().getString("server-name");
+        this.enableGlobalChat = getConfig().getBoolean("enable-global-chat");
         this.socketIP = getConfig().getString("socket.IP");
         this.socketPort = getConfig().getInt("socket.port");
     }
